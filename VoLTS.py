@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # NOTES
-# Strategy follows after Ivan's paper of AITA (Artificial Intelligence Technical Analysis)
+# Strategy follows after Letteri's paper of AITA (Artificial Intelligence Technical Analysis)
 # OHLC is Open, High, Low, Close (part of PA [price action])
 
 # Translating the modules and equation:
