@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import yfinance as yf
+from sklearn.neighbors import NearestNeighbors
 
 # NOTES
 # Strategy follows after Letteri's paper of AITA (Artificial Intelligence Technical Analysis)
@@ -222,3 +224,26 @@ class AitBT:
         ]
 
         return total_returns, standardised_returns
+
+
+##############################################################
+# Importing the Daily OHLC for the Assets Named in the Paper #
+##############################################################
+
+OHLC_df = yf.download(
+    ["MSFT", "GOOGL", "MU", "NVDA", "AMZN", "META", "QCOM", "IBM", "INTC"],
+    start="2014-01-01",
+    end="2024-01-01",
+    auto_adjust=True,
+)
+
+print(OHLC_df)
+
+##########################
+# AITA Anomaly Detection #
+##########################
+
+# Fit a KNN model to the time series data - Ensure adj_close is used to adjust for dividends, splits etc.
+# For each point, calculate distance to neighbors and anomaly score
+# Determine threshold based on mean and standard deviation of scores
+# Find points with score greater than threshold as anomalies
