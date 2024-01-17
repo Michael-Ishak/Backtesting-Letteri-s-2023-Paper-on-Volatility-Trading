@@ -247,3 +247,38 @@ print(OHLC_df)
 # For each point, calculate distance to neighbors and anomaly score
 # Determine threshold based on mean and standard deviation of scores
 # Find points with score greater than threshold as anomalies
+
+# As an example:
+
+k = 5
+
+price = OHLC_df['Close'].values
+nbrs = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(price)
+distances, indices = nbrs.kneighbors(price)
+print(indices)
+
+plt.scatter(price[:, 0], price[:, 1], color='blue', label='Original Data')
+
+for i in range(len(price)):
+    for j in indices[i]:
+        plt.plot([price[i, 0], price[j, 0]], [price[i, 1], price[j, 1]], color='red', alpha=0.5)  # Alpha for transparency
+
+plt.title("Nearest Neighbors in 2D Space")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.legend()
+plt.show()
+
+scores = []
+for i, x_t in enumerate(price):
+    distances, indices = nbrs.kneighbors([x_t])
+    
+    score_t = np.mean(distances)  
+    scores.append(score_t/k)
+
+threshold = np.mean(scores) + 3*np.std(scores)
+
+anomalies = []
+for i, score in enumerate(scores):
+    if score > threshold:
+        anomalies.append(i)
