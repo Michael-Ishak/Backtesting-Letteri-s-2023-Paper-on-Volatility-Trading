@@ -237,7 +237,7 @@ OHLC_df = yf.download(
     auto_adjust=True,
 )
 
-print(OHLC_df)
+# print(OHLC_df)
 
 ##########################
 # AITA Anomaly Detection #
@@ -252,16 +252,21 @@ print(OHLC_df)
 
 k = 5
 
-price = OHLC_df['Close'].values
-nbrs = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(price)
+price = OHLC_df["Close"].values
+nbrs = NearestNeighbors(n_neighbors=k, algorithm="auto").fit(price)
 distances, indices = nbrs.kneighbors(price)
-print(indices)
+# print(indices)
 
-plt.scatter(price[:, 0], price[:, 1], color='blue', label='Original Data')
+plt.scatter(price[:, 0], price[:, 1], color="blue", label="Original Data")
 
 for i in range(len(price)):
     for j in indices[i]:
-        plt.plot([price[i, 0], price[j, 0]], [price[i, 1], price[j, 1]], color='red', alpha=0.5)  # Alpha for transparency
+        plt.plot(
+            [price[i, 0], price[j, 0]],
+            [price[i, 1], price[j, 1]],
+            color="red",
+            alpha=0.5,
+        )  # Alpha for transparency
 
 plt.title("Nearest Neighbors in 2D Space")
 plt.xlabel("Feature 1")
@@ -272,13 +277,22 @@ plt.show()
 scores = []
 for i, x_t in enumerate(price):
     distances, indices = nbrs.kneighbors([x_t])
-    
-    score_t = np.mean(distances)  
-    scores.append(score_t/k)
 
-threshold = np.mean(scores) + 3*np.std(scores)
+    score_t = np.mean(distances)
+    scores.append(score_t / k)
+
+threshold = np.mean(scores) + 3 * np.std(scores)
 
 anomalies = []
 for i, score in enumerate(scores):
     if score > threshold:
         anomalies.append(i)
+
+
+####################################
+# Dataset of Historical Volatility #
+####################################
+
+print(OHLC_df['Close'])
+print(OHLC_df.columns)
+print(OHLC_df['Close']['META'])
