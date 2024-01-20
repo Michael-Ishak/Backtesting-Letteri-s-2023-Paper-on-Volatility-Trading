@@ -3,6 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import yfinance as yf
 from sklearn.neighbors import NearestNeighbors
+from scipy.spatial.distance import pdist, squareform
+from dtaidistance import dtw
+from sklearn.cluster import KMeans
 
 # NOTES
 # Strategy follows after Letteri's paper of AITA (Artificial Intelligence Technical Analysis)
@@ -283,16 +286,36 @@ for i, x_t in enumerate(price):
 
 threshold = np.mean(scores) + 3 * np.std(scores)
 
+print(threshold)
+
 anomalies = []
 for i, score in enumerate(scores):
     if score > threshold:
         anomalies.append(i)
 
+print(anomalies)
+
+
+for i in anomalies:
+    print(i / 365)
+
+# The exact parameters in paper for the KNN model isn't stated, an estimate is taken and the values show that the critical anomalies stop appearing after September 2020
+# Therefore, we can assume that the method is correct so far
 
 ####################################
 # Dataset of Historical Volatility #
 ####################################
 
-print(OHLC_df['Close'])
-print(OHLC_df.columns)
-print(OHLC_df['Close']['META'])
+# We use data from October 2020 to October 2023
+
+OHLC_df_refined = yf.download(
+    ["MSFT", "GOOGL", "MU", "NVDA", "AMZN", "META", "QCOM", "IBM", "INTC"],
+    start="2020-10-01",
+    end="2023-10-01",
+    auto_adjust=True,
+)
+price_refined = OHLC_df_refined["Close"].values
+nbrs_refined = NearestNeighbors(n_neighbors=3, algorithm="auto").fit(price_refined)
+distances, indices = nbrs.kneighbors(price_refined)
+
+d, path = dtw.distance(price_refined, distances)
